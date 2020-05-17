@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_api/home/widgets/tile_video.dart';
-import 'package:youtube_api/shared/custom_dio/custom_dio.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:youtube_api/shared/models/video_model.dart';
-
 import 'home_bloc.dart';
-import 'home_repository.dart';
+import 'widgets/tile_video.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -13,23 +11,9 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
-  HomeBloc bloc;
-
-  @override
-  void initState() {
-    bloc = HomeBloc(HomeRepository(CustomDio()));
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    bloc.dispose();
-    super.dispose();
-  }
-
+class HomePageState extends ModularState<HomePage, HomeBloc> {
   void search(String value) {
-    bloc.getVideos(search: value);
+    controller.getVideos(search: value);
   }
 
   @override
@@ -39,11 +23,11 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
-          onChanged: (value) => bloc.getVideos(search: value),
+          onChanged: (value) => controller.getVideos(search: value),
         ),
       ),
       body: StreamBuilder<List<VideoModel>>(
-          stream: bloc.videosOut,
+          stream: controller.videosOut,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text(snapshot.error.toString());
@@ -60,6 +44,17 @@ class HomePageState extends State<HomePage> {
                         crossAxisSpacing: 20),
                     itemBuilder: (context, index) => TileVideo(
                       snapshot: snapshot.data[index],
+                      onTap: () {
+                        Modular.to.pushNamed(
+                          "/video/${snapshot.data[index].id}",
+                        );
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => VideoPage(
+                        //               video: snapshot.data[index],
+                        //             )));
+                      },
                     ),
                   ),
                 ),

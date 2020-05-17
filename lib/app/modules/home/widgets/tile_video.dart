@@ -2,25 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:youtube_api/shared/custom_dio/custom_dio.dart';
 import 'package:youtube_api/shared/models/video_model.dart';
 import 'package:youtube_api/shared/utils/transform_util.dart';
-import 'package:youtube_api/video/video_page.dart';
 
 import '../home_repository.dart';
 
 class TileVideo extends StatelessWidget {
   final VideoModel snapshot;
-  const TileVideo({Key key, @required this.snapshot}) : super(key: key);
+  final VoidCallback onTap;
+  const TileVideo({Key key, @required this.snapshot, this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => VideoPage(
-                      video: snapshot,
-                    )));
-      },
+      onTap: onTap,
       child: Container(
         child: Column(
           children: <Widget>[
